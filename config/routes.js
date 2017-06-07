@@ -84,7 +84,7 @@ module.exports = function (app, passport) {
 
   // home route
   app.get('/', articles.index);
-  app.get('/play', play.play);
+  app.get('/play', auth.requiresLogin, play.play);
 
   // comment routes
   app.param('commentId', comments.load);
