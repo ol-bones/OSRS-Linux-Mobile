@@ -78,8 +78,12 @@ class UI {
 $(document).ready(function () {
 
 
-var interface = new UI();
+    var interface = new UI();
 
+    var requestURI = "/requestNode";
+    $.getJSON( requestURI ).done(function( data ) {
+        console.log(data);
+    });
 
 });
 

@@ -9,7 +9,7 @@ const articles = require('../app/controllers/articles');
 const comments = require('../app/controllers/comments');
 const tags = require('../app/controllers/tags');
 const play = require('../app/controllers/play');
-
+const nodeAgent = require('../app/controllers/nodeAgent');
 
 const auth = require('./middlewares/authorization');
 
@@ -47,7 +47,7 @@ module.exports = function (app, passport) {
   // home route
   app.get('/', articles.index);
   app.get('/play', auth.requiresLogin, play.play);
-
+  app.get('/requestNode/', auth.requiresLogin, nodeAgent.request);
   // tag routes
   app.get('/tags/:tag', tags.index);
 
