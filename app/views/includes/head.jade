@@ -1,4 +1,4 @@
-head(prefix="og: http://ogp.me/ns# nodejsexpressdemo: http://ogp.me/ns/apps/nodejsexpressdemo#")
+head(prefix="og: o")
   meta(charset="utf-8")
   meta(http-equiv="X-UA-Compatible", content="IE=edge,chrome=1")
   meta(name="viewport", content="width=device-width,initial-scale=1")
@@ -7,12 +7,10 @@ head(prefix="og: http://ogp.me/ns# nodejsexpressdemo: http://ogp.me/ns/apps/node
   meta(name="keywords", content="{{ pkg.keywords.join(',') }}")
   meta(name="description", content="{{ pkg.description }}")
 
-  meta(property="fb:app_id", content="293989217296609")
   meta(property="og:title", content=pkg.name + ' - ' + title)
   meta(property="og:description", content=pkg.description)
   meta(property="og:url", content="http://nodejs-express-demo.herokuapp.com")
-  meta(property="og:site_name", content="Node.js Express Mongoose Demo")
-  meta(property="fb:admins", content="1037213945")
+  meta(property="og:site_name", content="o")
 
   block head
     link(href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", rel="stylesheet")

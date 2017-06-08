@@ -42,55 +42,11 @@ module.exports = function (app, passport) {
       failureFlash: 'Invalid email or password.'
     }), users.session);
   app.get('/users/:userId', users.show);
-  app.get('/auth/facebook',
-    pauth('facebook', {
-      scope: [ 'email', 'user_about_me'],
-      failureRedirect: '/login'
-    }), users.signin);
-  app.get('/auth/facebook/callback', pauth('facebook', fail), users.authCallback);
-  app.get('/auth/github', pauth('github', fail), users.signin);
-  app.get('/auth/github/callback', pauth('github', fail), users.authCallback);
-  app.get('/auth/twitter', pauth('twitter', fail), users.signin);
-  app.get('/auth/twitter/callback', pauth('twitter', fail), users.authCallback);
-  app.get('/auth/google',
-    pauth('google', {
-      failureRedirect: '/login',
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/userinfo.email'
-      ]
-    }), users.signin);
-  app.get('/auth/google/callback', pauth('google', fail), users.authCallback);
-  app.get('/auth/linkedin',
-    pauth('linkedin', {
-      failureRedirect: '/login',
-      scope: [
-        'r_emailaddress'
-      ]
-    }), users.signin);
-  app.get('/auth/linkedin/callback', pauth('linkedin', fail), users.authCallback);
-
   app.param('userId', users.load);
-
-  // article routes
-  app.param('id', articles.load);
-  app.get('/articles', articles.index);
-  app.get('/articles/new', auth.requiresLogin, articles.new);
-  app.post('/articles', auth.requiresLogin, articles.create);
-  app.get('/articles/:id', articles.show);
-  app.get('/articles/:id/edit', articleAuth, articles.edit);
-  app.put('/articles/:id', articleAuth, articles.update);
-  app.delete('/articles/:id', articleAuth, articles.destroy);
 
   // home route
   app.get('/', articles.index);
   app.get('/play', auth.requiresLogin, play.play);
-
-  // comment routes
-  app.param('commentId', comments.load);
-  app.post('/articles/:id/comments', auth.requiresLogin, comments.create);
-  app.get('/articles/:id/comments', auth.requiresLogin, comments.create);
-  app.delete('/articles/:id/comments/:commentId', commentAuth, comments.destroy);
 
   // tag routes
   app.get('/tags/:tag', tags.index);
