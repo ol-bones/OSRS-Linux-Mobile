@@ -1,3 +1,11 @@
+
+
+
+function ui_left_button0() {
+    console.log("button0 press");
+}
+
+
 class UI {
 
     constructor() {
@@ -12,12 +20,28 @@ class UI {
         $(".game-canvas").on("swiperight", function() {
             self.canvasRightSwipe();
         });
+        $(".game-canvas").on("swipeup", function() {
+            self.canvasUpSwipe();
+        });
+
 
         this.m_RightVisible = false;
         this.m_LeftVisible = false;
 
         this.hideRight();
         this.hideLeft();
+
+        var buttons = [];
+
+        for(var i = 0; i < 14; i++) {
+            buttons.push($("#" + i));
+        }
+        console.log(buttons);
+        buttons[0].on("click", ui_left_button0);
+    }
+
+    canvasUpSwipe() {
+       $(".navbar").hide();
     }
 
     canvasLeftSwipe() {
@@ -77,6 +101,15 @@ class UI {
 
 $(document).ready(function () {
 
+    $("#fullscreen-button").on("click", function() {
+        var el = document.documentElement,
+        rfs = el.requestFullscreen
+            || el.webkitRequestFullScreen
+            || el.mozRequestFullScreen
+            || el.msRequestFullscreen;
+
+        rfs.call(el);
+    });
 
     var interface = new UI();
 
@@ -88,9 +121,12 @@ $(document).ready(function () {
 });
 
 
+$(document).on("mobileinit", function() {
+        $.mobile.autoInitializePage = false;
+        $.mobile.loadingMessage = false;
+});
 
-
-
+$.mobile.autoInitializePage = false;
 
 
 

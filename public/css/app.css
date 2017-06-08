@@ -155,8 +155,7 @@ button.error:focus {
 
 .game-ui-button {
     width: 100%;
-    height: 17.5%;
-
+    height: 12.5%;
     margin-bottom: 4px;
     background-color: #ff0000;
 }
