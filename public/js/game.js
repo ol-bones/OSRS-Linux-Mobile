@@ -42,6 +42,7 @@ class UI {
 
     canvasUpSwipe() {
        $(".navbar").hide();
+        console.log("herp");
     }
 
     canvasLeftSwipe() {
@@ -102,6 +103,7 @@ class UI {
 $(document).ready(function () {
 
     $("#fullscreen-button").on("click", function() {
+        $('.navbar').hide();
         var el = document.documentElement,
         rfs = el.requestFullscreen
             || el.webkitRequestFullScreen
@@ -109,7 +111,9 @@ $(document).ready(function () {
             || el.msRequestFullscreen;
 
         rfs.call(el);
-    });
+        setTimeout(function() {
+$(".game-content").css({"top":"0%", "position": "absolute"});}, 100);
+   });
 
     var interface = new UI();
 
