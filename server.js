@@ -19,9 +19,19 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const config = require('./config');
 
+const Node = require('./app/utils/nodeserver');
+const ServerList = require('./app/utils/serverlist');
+
+
 const models = join(__dirname, 'app/models');
 const port = process.env.PORT || 5000;
 const app = express();
+
+var s_ServerList = new ServerList();
+s_ServerList.pollNodes();
+
+console.log(s_ServerList.Nodes);
+
 
 /**
  * Expose
@@ -44,7 +54,8 @@ connect()
   .on('disconnected', connect)
   .once('open', listen);
 
-function listen () {
+function listen ()
+{
   if (app.get('env') === 'test') return;
   app.listen(port);
   console.log('Express app started on port ' + port);

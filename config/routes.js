@@ -47,7 +47,7 @@ module.exports = function (app, passport) {
   // home route
   app.get('/', articles.index);
   app.get('/play', auth.requiresLogin, play.play);
-  app.get('/requestNode/', auth.requiresLogin, nodeAgent.request);
+  app.get('/requestNode/', auth.requiresLogin, play.connect);
   // tag routes
   app.get('/tags/:tag', tags.index);
 
