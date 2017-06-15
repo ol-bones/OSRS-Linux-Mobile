@@ -1,5 +1,5 @@
 'use strict';
-
+console.log("[INFO] -- Server launching...");
 /*
  * nodejs-express-mongoose-demo
  * Copyright(c) 2013 Madhusudhan Srinivasa <madhums8@gmail.com>
@@ -27,9 +27,11 @@ const models = join(__dirname, 'app/models');
 const port = process.env.PORT || 5000;
 const app = express();
 
+console.log("[INFO] -- Express loading");
+
 var s_ServerList = new ServerList();
 s_ServerList.pollNodes();
-
+app.g_ServerList = s_ServerList;
 console.log(s_ServerList.Nodes);
 
 
@@ -39,10 +41,14 @@ console.log(s_ServerList.Nodes);
 
 module.exports = app;
 
+console.log("[INFO] -- Server started");
+
 // Bootstrap models
 fs.readdirSync(models)
-  .filter(file => ~file.search(/^[^\.].*\.js$/))
-  .forEach(file => require(join(models, file)));
+    .filter(file => ~file.search(/^[^\.].*\.js$/))
+    .forEach(file => require(join(models, file)));
+
+console.log("[INFO] -- Opening route endpoints");
 
 // Bootstrap routes
 require('./config/passport')(passport);
@@ -50,18 +56,19 @@ require('./config/express')(app, passport);
 require('./config/routes')(app, passport);
 
 connect()
-  .on('error', console.log)
-  .on('disconnected', connect)
-  .once('open', listen);
+    .on('error', console.log)
+    .on('disconnected', connect)
+    .once('open', listen);
 
 function listen ()
 {
-  if (app.get('env') === 'test') return;
-  app.listen(port);
-  console.log('Express app started on port ' + port);
+    if (app.get('env') === 'test') { return };
+    app.listen(port);
+    console.log('[INFO] -- Server listening on *:' + port);
 }
 
-function connect () {
-  var options = { server: { socketOptions: { keepAlive: 1 } } };
-  return mongoose.connect(config.db, options).connection;
+function connect ()
+{
+    var options = { server: { socketOptions: { keepAlive: 1 } } };
+    return mongoose.connect(config.db, options).connection;
 }

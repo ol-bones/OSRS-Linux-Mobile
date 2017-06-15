@@ -11,15 +11,14 @@ const { respond, respondOrRedirect } = require('../utils');
 const ServerList = require('../utils/serverlist');
 const assign = Object.assign;
 
-exports.play= function (req, res){
-  res.render('play');
+exports.play = function (req, res)
+{
+    res.render('play');
 };
 
 exports.connect = function(req, res)
 {
-    var s = new ServerList();
-    console.log(s);
-    res.json(s.getSuitableNode());
+    res.json(req.g_ServerList);
 };
 
 

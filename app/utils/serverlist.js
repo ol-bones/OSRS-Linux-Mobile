@@ -63,8 +63,6 @@ class ServerList
             {
                 console.log("bitch");
             }
-        
-        
         }
     }
 
