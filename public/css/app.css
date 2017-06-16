@@ -168,6 +168,30 @@ button.error:focus {
 
 
 
+/**
+ * Navbar Additions
+ */
+
+.fullscreen-toggle {
+    position:absolute;
+
+    width:10%;
+
+
+    top:0%;
+    left:70%;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

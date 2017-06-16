@@ -1,27 +1,55 @@
 
 
 
-function ui_left_button0() {
+function ui_left_button0()
+{
     console.log("button0 press");
 }
 
 
-class UI {
+class UI
+{
 
-    constructor() {
+    constructor()
+    {
 
         this.m_RightDiv = $(".game-ui-right");
         this.m_LeftDiv = $(".game-ui-left");
+        this.m_IsFullscreen = false;
+
         var self = this;
 
-        $(".game-canvas").on("swipeleft", function() {
+        $(".game-canvas").on("swipeleft", function()
+        {
             self.canvasLeftSwipe();
         });
-        $(".game-canvas").on("swiperight", function() {
+        $(".game-canvas").on("swiperight", function()
+        {
             self.canvasRightSwipe();
         });
-        $(".game-canvas").on("swipeup", function() {
+        $(".game-canvas").on("swipeup", function()
+        {
             self.canvasUpSwipe();
+        });
+        $(document).on("webkitfullscreenchange", function(evt)
+        {
+            self.m_IsFullscreen = !self.m_IsFullscreen;
+
+            setTimeout(function()
+            {
+                if(!self.m_IsFullscreen)
+                {
+                    console.log("exit fs");
+                    $(".navbar").show();
+                    $(".game-content").css({"top":"0%", "position": "absolute"});
+                }
+                else
+                {
+                    console.log("enter fs");
+                    $(".navbar").hide();
+                    $(".game-content").css({"top":"0%", "position": "absolute"});
+                }
+            }, 100);
         });
 
 
@@ -33,55 +61,67 @@ class UI {
 
         var buttons = [];
 
-        for(var i = 0; i < 14; i++) {
+        for(var i = 0; i < 14; i++)
+        {
             buttons.push($("#" + i));
         }
         console.log(buttons);
         buttons[0].on("click", ui_left_button0);
     }
 
-    canvasUpSwipe() {
+    canvasUpSwipe()
+    {
        $(".navbar").hide();
         console.log("herp");
     }
 
-    canvasLeftSwipe() {
-        if(this.m_LeftVisible) {
+    canvasLeftSwipe()
+    {
+        if(this.m_LeftVisible)
+        {
             this.hideLeft();
             return;
         }
-        else if(!this.m_RightVisible) {
+        else if(!this.m_RightVisible)
+        {
             this.showRight();
         }
     }
 
-    canvasRightSwipe() {
-        if(this.m_RightVisible) {
+    canvasRightSwipe()
+    {
+        if(this.m_RightVisible)
+        {
             this.hideRight();
             return;
         }
-        else if(!this.m_LeftVisible) {
+        else if(!this.m_LeftVisible)
+        {
             this.showLeft();
         }
     }
 
-    showRight() {
+    showRight()
+    {
         this.m_RightDiv.show();
         this.m_RightVisible = true;
     }
 
-    hideRight() {
+    hideRight()
+    {
         $(".game-ui-right").hide();
         this.m_RightDiv.hide();
         this.m_RightVisible = false;
     }
 
-    showLeft() {
+    showLeft()
+    {
         this.m_LeftDiv.show();
         this.m_LeftVisible = true;
     }
 
-    hideLeft() {
+    hideLeft()
+    {
         $(".game-ui-left").hide();
         this.m_LeftDiv.hide();
         this.m_LeftVisible = false;
@@ -100,9 +140,10 @@ class UI {
 
 
 
-$(document).ready(function () {
-
-    $("#fullscreen-button").on("click", function() {
+$(document).ready(function ()
+{
+    $("#fullscreen-button").on("click", function()
+    {
         $('.navbar').hide();
         var el = document.documentElement,
         rfs = el.requestFullscreen
@@ -111,23 +152,29 @@ $(document).ready(function () {
             || el.msRequestFullscreen;
 
         rfs.call(el);
-        setTimeout(function() {
-$(".game-content").css({"top":"0%", "position": "absolute"});}, 100);
-   });
+
+        // wait for DOM update from hide()^
+        setTimeout(function()
+        {
+            $(".game-content").css({"top":"0%", "position": "absolute"});
+        }, 100);
+    });
 
     var interface = new UI();
 
-    var requestURI = "/requestNode";
-    $.getJSON( requestURI ).done(function( data ) {
+    var requestURI = "/requestNode/";
+    $.getJSON( requestURI ).done(function(data)
+    {
         console.log(data);
     });
 
 });
 
 
-$(document).on("mobileinit", function() {
-        $.mobile.autoInitializePage = false;
-        $.mobile.loadingMessage = false;
+$(document).on("mobileinit", function()
+{
+    $.mobile.autoInitializePage = false;
+    $.mobile.loadingMessage = false;
 });
 
 $.mobile.autoInitializePage = false;
