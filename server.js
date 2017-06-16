@@ -22,24 +22,24 @@ const config = require('./config');
 const Node = require('./app/utils/nodeserver');
 const ServerList = require('./app/utils/serverlist');
 
-
 const models = join(__dirname, 'app/models');
 const port = process.env.PORT || 5000;
 const app = express();
 
 console.log("[INFO] -- Express loading");
 
-var s_ServerList = new ServerList();
-s_ServerList.pollNodes();
-app.g_ServerList = s_ServerList;
-console.log(s_ServerList.Nodes);
-
-
 /**
  * Expose
  */
 
 module.exports = app;
+
+var g_ServerList = new ServerList();
+g_ServerList.pollNodes();
+console.log(g_ServerList);
+
+console.log("");
+console.log("");
 
 console.log("[INFO] -- Server started");
 
@@ -53,7 +53,7 @@ console.log("[INFO] -- Opening route endpoints");
 // Bootstrap routes
 require('./config/passport')(passport);
 require('./config/express')(app, passport);
-require('./config/routes')(app, passport);
+require('./config/routes')(app, passport, g_ServerList);
 
 connect()
     .on('error', console.log)

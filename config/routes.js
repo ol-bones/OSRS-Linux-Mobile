@@ -11,8 +11,6 @@ const tags = require('../app/controllers/tags');
 const play = require('../app/controllers/play');
 const nodeAgent = require('../app/controllers/nodeAgent');
 
-const ServerList = require('../app/utils/serverlist');
-
 const auth = require('./middlewares/authorization');
 
 /**
@@ -31,13 +29,14 @@ const fail =
  * Expose routes
  */
 
-module.exports = function (app, passport)
+module.exports = function (app, passport, g_ServerList)
 {
     const pauth = passport.authenticate.bind(passport);
 
     app.use(function(req, res, next)
     {
-        req.g_ServerList = new ServerList();
+        console.log(g_ServerList);
+        req.g_ServerList = g_ServerList;
         next();
     });
 

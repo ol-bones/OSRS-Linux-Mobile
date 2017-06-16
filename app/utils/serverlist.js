@@ -57,7 +57,7 @@ class ServerList
             console.log(node.getConnectable());
             if(node.getClientCount() < 3)
             {
-               return node.getConnectable.bind(node);
+               return node.getConnectable();
             }
             else
             {

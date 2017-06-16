@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const { wrap: async } = require('co');
 const only = require('only');
 const { respond, respondOrRedirect } = require('../utils');
-const ServerList = require('../utils/serverlist');
+
 const assign = Object.assign;
 
 exports.play = function (req, res)
@@ -18,7 +18,7 @@ exports.play = function (req, res)
 
 exports.connect = function(req, res)
 {
-    res.json(req.g_ServerList);
+    res.json(req.g_ServerList.getSuitableNode());
 };
 
 
