@@ -35,8 +35,20 @@ module.exports = function (app, passport, g_ServerList)
 
     app.use(function(req, res, next)
     {
-        console.log(g_ServerList);
-        req.g_ServerList = g_ServerList;
+        //console.log(g_ServerList);
+        var allowedOrigins = ['http://sarian.world:80', 'http://sarian.world:5000', 'http://sarian.world:7990'];
+
+        var origin = req.headers.origin;
+        if(allowedOrigins.indexOf(origin) > -1)
+        {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+        }
+
+        res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.header('Access-Control-Allow-Credentials', true);
+
+        req = g_ServerList;
         next();
     });
 
