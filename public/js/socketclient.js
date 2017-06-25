@@ -22,6 +22,23 @@ $(document).ready(function()
 
     socket.emit("connect");
 
+    socket.on("data", function(data)
+    {
+        console.log(data.data);
+
+        var cv = document.createElement("canvas");
+        var ctx = cv.getContext("2d");
+
+        cv.width = 100;
+        cv.height = 100;
+
+        var img = atob(data.data);
+
+        var cimgd = ctx.createImageData(100, 100);
+        cimgd.data.set(img);
+        ctx.putImageData(cimgd, 0, 0);
+        document.body.appendChild(cv);
+    });
 
 });
 
