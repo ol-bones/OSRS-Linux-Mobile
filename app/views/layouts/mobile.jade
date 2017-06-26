@@ -5,14 +5,8 @@ html(lang="en")
   link(rel="stylesheet", href="/css/bootstrap-responsive.min.css")
   body
     include ../includes/header
-    .alert
-      |  You are checking this out from your mobile device!
-    .container
-      .page-header
-        block main
-      .messages
-        include ../includes/messages
-      .content
+   .container
+     .content
         block content
     include ../includes/footer
     include ../includes/foot
