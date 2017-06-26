@@ -24,20 +24,19 @@ $(document).ready(function()
 
     socket.on("data", function(data)
     {
-        console.log(data.data);
-
-        var cv = document.createElement("canvas");
-        var ctx = cv.getContext("2d");
-
-        cv.width = 100;
-        cv.height = 100;
-
-        var img = atob(data.data);
-
+        var imgData = (JSON.parse(data.data));
+        var ctx = $(".game-canvas")[0].getContext("2d");
         var cimgd = ctx.createImageData(100, 100);
-        cimgd.data.set(img);
+
+        for(var i = 0; i < 40000; i+=3)
+        {
+            cimgd.data[i] = imgData[i];
+            cimgd.data[i+1] = imgData[i+1];
+            cimgd.data[i+2] = imgData[i+2];
+            cimgd.data[i+3] = 255;
+        }
+
         ctx.putImageData(cimgd, 0, 0);
-        document.body.appendChild(cv);
     });
 
 });
