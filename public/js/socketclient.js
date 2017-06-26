@@ -22,6 +22,22 @@ $(document).ready(function()
 
     socket.emit("connect");
 
+    socket.on("data", function(data)
+    {
+        var imgData = (JSON.parse(data.data));
+        var ctx = $(".game-canvas")[0].getContext("2d");
+        var cimgd = ctx.createImageData(100, 100);
+
+        for(var i = 0; i < 40000; i+=3)
+        {
+            cimgd.data[i] = imgData[i];
+            cimgd.data[i+1] = imgData[i+1];
+            cimgd.data[i+2] = imgData[i+2];
+            cimgd.data[i+3] = 255;
+        }
+
+        ctx.putImageData(cimgd, 0, 0);
+    });
 
 });
 
