@@ -4,10 +4,8 @@
  * Module dependencies.
  */
 
+const index = require('../app/controllers/index');
 const users = require('../app/controllers/users');
-const articles = require('../app/controllers/articles');
-const comments = require('../app/controllers/comments');
-const tags = require('../app/controllers/tags');
 const play = require('../app/controllers/play');
 const nodeAgent = require('../app/controllers/nodeAgent');
 
@@ -68,13 +66,9 @@ module.exports = function (app, passport, g_ServerList)
     app.param('userId', users.load);
 
     // play routes
-    app.get('/', articles.index);
+    app.get('/', index.index);
     app.get('/play', auth.requiresLogin, play.play);
     app.get('/requestNode/', auth.requiresLogin, play.connect);
-
-    // tag routes
-    app.get('/tags/:tag', tags.index);
-
 
     /**
     * Error handling

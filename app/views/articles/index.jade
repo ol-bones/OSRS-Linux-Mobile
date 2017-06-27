@@ -1,16 +1,4 @@
 extends ../layouts/default
-
-block main
-  h1= title
-
 block content
-  - if (articles.length)
-    - each article in articles
-      include article
-
-    - if (pages > 1)
-      ul.pagination
-        != createPagination(pages, page)
-  - else
-    h4.muted No articles.&nbsp;
-      a(href="/articles/new") create one
+    p.
+        kek
