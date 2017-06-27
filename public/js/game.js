@@ -19,18 +19,24 @@ class UI
 
         var self = this;
 
-        $(".game-canvas").on("swipeleft", function()
+        var canvasElement = $(".game-canvas");
+
+        canvasElement.on("swipeleft", function()
         {
             self.canvasLeftSwipe();
         });
-        $(".game-canvas").on("swiperight", function()
+        canvasElement.on("swiperight", function()
         {
             self.canvasRightSwipe();
         });
-        $(".game-canvas").on("swipeup", function()
+        canvasElement.on("swipeup", function()
         {
             self.canvasUpSwipe();
         });
+
+        canvasElement[0].width = canvasElement[0].offsetWidth;
+        canvasElement[0].height = canvasElement[0].offsetHeight;
+
         $(document).on("webkitfullscreenchange", function(evt)
         {
             self.m_IsFullscreen = !self.m_IsFullscreen;
@@ -51,7 +57,6 @@ class UI
                 }
             }, 100);
         });
-
 
         this.m_RightVisible = false;
         this.m_LeftVisible = false;
