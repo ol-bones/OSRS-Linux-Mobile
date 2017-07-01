@@ -18,9 +18,34 @@ class NetworkClient
 
         var socket = io("80.255.0.159:7990", connectionOptions);
 
-        var NodeURI = "ws://" + NodeAddress + ":" + NodePort;
+        var imgData = (JSON.parse(data.data));
+        var ctx = $(".game-canvas")[0].getContext("2d");
+        cimgd = ctx.createImageData(100, 100);
 
-        socket.connect(NodeURI + "/");
+        var dataIndex = 0;
+        var cimgdSize = 100 * 100 * 4;
+
+        for(var i = 0; i < cimgdSize; i+=4)
+        {
+            cimgd.data[i] = imgData[dataIndex++];
+            cimgd.data[i+1] = imgData[dataIndex++];
+            cimgd.data[i+2] = imgData[dataIndex++];
+            cimgd.data[i+3] = 255;
+        }
+
+        ctx.putImageData(cimgd, 20, 20);
+
+        $(window).resize(function()
+        {
+            var cvs = $(".game-canvas")[0];
+            var ctx = cvs.getContext("2d");
+            if (cimgd != null)
+            {
+                cvs.width = cvs.offsetWidth;
+                cvs.height = cvs.offsetHeight;
+                ctx.putImageData(cimgd, 20, 20);
+            }
+        });
 
         socket.emit("connect");
 
@@ -46,5 +71,4 @@ class NetworkClient
             socket.emit("ui_data", {"x": ui.m_LastTap.clientX, "y": ui.m_LastTap.clientY});
         }, 2500);
     }
-
 }
