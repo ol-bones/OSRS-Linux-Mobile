@@ -12,8 +12,7 @@ class NetworkClient
             "reconnectionattempts": "Infinity",
             "timeout": 10000,
             "transports": ["websocket"],
-            "rememberTransport": false,
-            "transports": ['websocket']
+            "rememberTransport": false
         };
 
         var socket = io("80.255.0.159:7990", connectionOptions);
