@@ -2,7 +2,7 @@ class NetworkClient
 {
     constructor(ui)
     {
-        var NodeAddress = "192.168.11.20";
+        var NodeAddress = "80.255.0.159";
         var NodePort = "7990";
 
         var cvs = $(".game-canvas")[0];

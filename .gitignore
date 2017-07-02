@@ -5,3 +5,4 @@ Makefile
 .DS_Store
 .env
 *.swp
+package-lock.json

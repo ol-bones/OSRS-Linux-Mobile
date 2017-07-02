@@ -68,7 +68,7 @@ module.exports = function (app, passport, g_ServerList)
     // play routes
     app.get('/', index.index);
     app.get('/play', auth.requiresLogin, play.play);
-    app.get('/requestNode/', auth.requiresLogin, play.connect);
+    app.get('/requestNode/', auth.requiresLogin, play.requestNode);
 
     /**
     * Error handling
