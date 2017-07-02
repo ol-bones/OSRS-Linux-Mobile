@@ -2,9 +2,13 @@ class NetworkClient
 {
     constructor(ui)
     {
-        var NodeAddress = "80.255.0.159";
+        var NodeAddress = "192.168.11.20";
         var NodePort = "7990";
 
+        var cvs = $(".game-canvas")[0];
+        var ctx = cvs.getContext("2d");
+        var cimgd = null;
+        var cimgPos = { x:20, y:20 };
 
         var connectionOptions =
         {
@@ -15,37 +19,53 @@ class NetworkClient
             "rememberTransport": false
         };
 
-        var socket = io("80.255.0.159:7990", connectionOptions);
+        var socket = io(NodeAddress + ":" + NodePort, connectionOptions);
+
+        function setRealCanvasSize()
+        {
+            cvs.width = cvs.offsetWidth;
+            cvs.height = cvs.offsetHeight;
+            if (cimgd != null)
+            {
+                ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
+            }
+        }
+
+        setRealCanvasSize();
 
         $(window).resize(function()
         {
-            var cvs = $(".game-canvas")[0];
-            var ctx = cvs.getContext("2d");
-            if (cimgd != null)
-            {
-                cvs.width = cvs.offsetWidth;
-                cvs.height = cvs.offsetHeight;
-                ctx.putImageData(cimgd, 20, 20);
-            }
+            setRealCanvasSize();
         });
 
         socket.emit("connect");
 
         socket.on("data", function(data)
         {
-            var imgData = (JSON.parse(data.data));
-            var ctx = $(".game-canvas")[0].getContext("2d");
-            var cimgd = ctx.createImageData(100, 100);
+            var imgWidth = new DataView(data, 0, 2).getUint16(0, false);
+            var imgData = new Uint8Array(data.slice(2));
+            var imgHeight = (imgData.byteLength / 3) / imgWidth;
 
-            for(var i = 0; i < 40000; i+=3)
+            // var b64imgData = btoa(imgData); // Binary to ASCII
+            // var img = new Image();
+            // img.src = "data:image/jpeg;base64," + b64imgData;
+
+            // ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
+        
+            cimgd = ctx.createImageData(imgWidth, imgHeight);
+
+            var dataIndex = 0;
+            var cimgdSize = imgWidth * imgHeight * 4;
+
+            for(var i = 0; i < cimgdSize; i+=4)
             {
-                cimgd.data[i] = imgData[i];
-                cimgd.data[i+1] = imgData[i+1];
-                cimgd.data[i+2] = imgData[i+2];
+                cimgd.data[i] = imgData[dataIndex++];
+                cimgd.data[i+1] = imgData[dataIndex++];
+                cimgd.data[i+2] = imgData[dataIndex++];
                 cimgd.data[i+3] = 255;
             }
 
-            ctx.putImageData(cimgd, 0, 0);
+            ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
         });
 
         setInterval(function()
