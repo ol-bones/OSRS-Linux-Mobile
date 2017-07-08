@@ -21,7 +21,7 @@ $(document).ready(function ()
     var ui = new UI(client);
     var client = new NetworkClient(ui);
 
-    var requestURI = "/requestNode/";
+    var requestURI = "/requestNode";
     $.getJSON( requestURI ).done(function(data)
     {
         console.log(data);

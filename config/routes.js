@@ -50,6 +50,12 @@ module.exports = function (app, passport, g_ServerList)
         next();
     });
 
+    // play routes
+    app.get('/', index.index);
+    app.get('/play', auth.requiresLogin, play.play);
+    console.log("kekekekek");
+    app.get('/requestNode', auth.requiresLogin, play.requestNode);
+
     // user routes
     app.get('/login', users.login);
     app.get('/signup', users.signup);
@@ -62,14 +68,9 @@ module.exports = function (app, passport, g_ServerList)
         failureRedirect: '/login',
         failureFlash: 'Invalid email or password.'
     }), users.session);
+
     app.get('/users/:userId', users.show);
     app.param('userId', users.load);
-
-    // play routes
-    app.get('/', index.index);
-    app.get('/play', auth.requiresLogin, play.play);
-    app.get('/requestNode/', auth.requiresLogin, play.connect);
-
     /**
     * Error handling
     */

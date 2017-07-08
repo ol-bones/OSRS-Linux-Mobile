@@ -9,6 +9,9 @@ const { wrap: async } = require('co');
 const only = require('only');
 const { respond, respondOrRedirect } = require('../utils');
 
+
+const request = require('request');
+
 const assign = Object.assign;
 
 exports.play = function (req, res)
