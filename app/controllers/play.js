@@ -21,6 +21,7 @@ exports.play = function (req, res)
 
 exports.requestNode = function(req, res)
 {
+    console.log("/requestNode");
     var headers =
     {
         "User-Agent": "WebFront",
