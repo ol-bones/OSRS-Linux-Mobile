@@ -10,6 +10,10 @@ class NetworkClient
         var cimgd = null;
         var cimgPos = { x:0, y:0 };
 
+        this.m_ImageDataQueue = [];
+
+        this.m_LastReceived = 0;
+
         var connectionOptions =
         {
             "force new connection": true,
@@ -40,21 +44,13 @@ class NetworkClient
 
         socket.emit("connect");
 
-        socket.on("data", function(data)
+        socket.on("data", (data) =>
         {
-            //var imgWidth = new DataView(data, 0, 2).getUint16(0, false);
-            var imgData = new Uint8Array(data.image);
-           // var imgHeight = (imgData.byteLength / 3) / imgWidth;
-    
-            var imgWidth = data.width;
-            var imgHeight = data.height;
+            var imgData = new Uint8Array(data[0].image);
 
-            // var b64imgData = btoa(imgData); // Binary to ASCII
-            // var img = new Image();
-            // img.src = "data:image/jpeg;base64," + b64imgData;
+            var imgWidth = data[0].width;
+            var imgHeight = data[0].height;
 
-            // ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
-        
             cimgd = ctx.createImageData(imgWidth, imgHeight);
 
             var dataIndex = 0;
@@ -68,42 +64,21 @@ class NetworkClient
                 cimgd.data[i+3] = imgData[dataIndex++];
             }
 
-            ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
+            this.m_ImageDataQueue.push([cimgd, cimgPos, Date.now() - this.m_LastReceived, Date.now() - data[1]]);
+            this.m_LastReceived = Date.now();
+
+            //ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
         });
-        socket.on("changedData", function(data)
+
+
+        setInterval(() =>
         {
-            if(data.length === 0) { return; }
-            console.log("cd");
-            var imgWidth = new DataView(data, 0, 2).getUint16(0, false);
-            var imgData = new Uint8Array(data.slice(2));
-            var imgHeight = (imgData.byteLength / 3) / imgWidth;
-
-            // var b64imgData = btoa(imgData); // Binary to ASCII
-            // var img = new Image();
-            // img.src = "data:image/jpeg;base64," + b64imgData;
-
-            // ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
-            cimgd = ctx.createImageData(imgWidth, imgHeight);
-
-            var dataIndex = 0;
-            var cimgdSize = imgWidth * imgHeight * 4;
-
-            for(var i = 0; i < cimgdSize; i+=4)
-            {
-                if(cimgd.data[i] === 0)
-                {
-                    i+=4;
-                    continue;
-                }
-                cimgd.data[i] = imgData[dataIndex++];
-                cimgd.data[i+1] = imgData[dataIndex++];
-                cimgd.data[i+2] = imgData[dataIndex++];
-                cimgd.data[i+3] = 255;
-            }
-
-            ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
-        });
-
+            let lastImage = this.m_ImageDataQueue.pop();
+            console.log(lastImage);
+            console.log(this.m_ImageDataQueue.length);
+            if(lastImage === undefined || lastImage.length === 0) { return; }
+            ctx.putImageData(lastImage[0], lastImage[1].x, lastImage[1].y);
+        }, 50);
 
         setInterval(function()
         {
