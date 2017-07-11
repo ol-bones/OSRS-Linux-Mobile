@@ -56,27 +56,35 @@ class NetworkClient
             var dataIndex = 0;
             var cimgdSize = imgWidth * imgHeight * 4;
 
-            for(var i = 0; i < cimgdSize; i+=4)
+            for(var i = 0; i < imgData.length; i+=4)
             {
-                cimgd.data[i] = imgData[dataIndex++];
-                cimgd.data[i+1] = imgData[dataIndex++];
-                cimgd.data[i+2] = imgData[dataIndex++];
-                cimgd.data[i+3] = imgData[dataIndex++];
+                // goodenough.jpg
+                cimgd.data[i]   = 255/4 + imgData[dataIndex++];// + imgData[dataIndex++];
+                cimgd.data[i+1] = 255/4 + imgData[dataIndex++];// + imgData[dataIndex++];
+                cimgd.data[i+2] = 255/4 + imgData[dataIndex++];// + imgData[dataIndex++];
+                cimgd.data[i+3] = 255/4 + imgData[dataIndex++];//imgData[dataIndex++] + imgData[dataIndex++];
             }
 
+            if(Date.now() - this.m_LastReceived > 2000)
+            {
+                this.m_ImageDataQueue = [];
+            }
             this.m_ImageDataQueue.push([cimgd, cimgPos, Date.now() - this.m_LastReceived, Date.now() - data[1]]);
             this.m_LastReceived = Date.now();
 
             //ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
         });
 
-
         setInterval(() =>
         {
             let lastImage = this.m_ImageDataQueue.pop();
-            console.log(lastImage);
-            console.log(this.m_ImageDataQueue.length);
+            //console.log(lastImage);
+            //console.log(this.m_ImageDataQueue.length);
             if(lastImage === undefined || lastImage.length === 0) { return; }
+            if(lastImage[3] >= 1500)
+            {
+                this.m_ImageDataQueue = [];
+            }
             ctx.putImageData(lastImage[0], lastImage[1].x, lastImage[1].y);
         }, 50);
 
