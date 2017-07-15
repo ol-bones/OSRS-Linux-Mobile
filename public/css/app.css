@@ -43,14 +43,13 @@ body {
   App styles
   ------------------------------------------------ */
 
-body {
-    overflow: hidden;
-    padding-top: 60px;
+.content {
+    padding-top: 15% !important;
 }
 
-.article, .comment {
-  padding: 15px 0;
-  border-bottom: 1px solid #e8e8e8;
+body {
+    background-color: #222222;
+    overflow: hidden;
 }
 
 .form-signin {
@@ -87,9 +86,14 @@ button.error:focus {
   margin-top: 10px;
 }
 
+.navbar {
+    background-color: #333333;
+    color: #FFFFFF !important;
+}
+
 .navbar-brand {
   font-size: 14px;
-  color: #000 !important;
+  color: #FFFFFF !important;
 }
 
 .navbar-right > li > a {
@@ -97,6 +101,10 @@ button.error:focus {
   padding-right: 5px;
 }
 
+.oNav {
+    color:#FFFFFF !important;
+    background-color:#333333 !important;
+}
 /**
  * Signup / login
  */
@@ -117,7 +125,28 @@ button.error:focus {
   border-top-right-radius: 0;
 }
 
+/*
+ * Web
+ */
 
+.desktop-content {
+    position:absolute;
+    top:10%;
+    left:10%;
+    width:80%;
+    height:100%;
+    background-color: #222222;
+    color: #FFFFFF;
+}
+
+.desktop-description {
+   width:50%;
+}
+
+
+/*
+ * Game Content
+ */
 
 .game-canvas {
     width: 100%;

@@ -15,9 +15,6 @@ const auth = require('./middlewares/authorization');
  * Route middlewares
  */
 
-const articleAuth = [auth.requiresLogin, auth.article.hasAuthorization];
-const commentAuth = [auth.requiresLogin, auth.comment.hasAuthorization];
-
 const fail =
 {
     failureRedirect: '/login'
@@ -53,7 +50,6 @@ module.exports = function (app, passport, g_ServerList)
     // play routes
     app.get('/', index.index);
     app.get('/play', auth.requiresLogin, play.play);
-    console.log("kekekekek");
     app.get('/requestNode', auth.requiresLogin, play.requestNode);
 
     // user routes

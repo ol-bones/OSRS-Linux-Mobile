@@ -3,26 +3,30 @@ class UI
     constructor()
     {
 
+        this.m_Canvas = $(".game-canvas");
         this.m_RightDiv = $(".game-ui-right");
         this.m_LeftDiv = $(".game-ui-left");
         this.m_IsFullscreen = false;
 
-        this.m_LastTap = {};
+        this.m_Events = [];
 
         var self = this;
 
-        $(".game-canvas").on("tap", function(evt)
+        $(window).on("orientationchange", (evt) =>
         {
-            // clientX + clientY
-            self.m_LastTap = evt;
+            self.orientationChange(evt);
         });
-        $(".game-canvas").on("swipeleft", function()
+        $(".game-canvas").on("tap", (evt) =>
         {
-            self.canvasLeftSwipe();
+            self.canvasTap(evt);
         });
-        $(".game-canvas").on("swiperight", function()
+        $(".game-canvas").on("swipeleft", function(evt)
         {
-            self.canvasRightSwipe();
+            self.canvasLeftSwipe(evt);
+        });
+        $(".game-canvas").on("swiperight", function(evt)
+        {
+            self.canvasRightSwipe(evt);
         });
         $(".game-canvas").on("swipeup", function()
         {
@@ -83,35 +87,77 @@ class UI
         console.log(buttons);
     }
 
+    orientationChange(evt)
+    {
+        this.m_Events.push(
+        {
+            "Type": "UIDimensions",
+            "Data": [this.m_Canvas[0].width, this.m_Canvas[0].height]
+        });
+    }
+
+    canvasTap(evt)
+    {
+        this.m_Events.push(
+        {
+            "Type": "UITap",
+            "Data": [evt.clientX, evt.clientY]
+        });
+    }
+
     canvasUpSwipe()
     {
-       $(".navbar").hide();
+        $(".navbar").hide();
         console.log("herp");
     }
 
-    canvasLeftSwipe()
+    canvasLeftSwipe(evt)
     {
-        if(this.m_LeftVisible)
+        var xStart = evt.swipestart.coords[0];
+        var xEnd   = evt.swipestop.coords[0];
+        var xDist  = Math.abs(xEnd-xStart);
+
+        if(this.m_LeftVisible && xStart < window.innerWidth*0.2)
         {
             this.hideLeft();
             return;
         }
-        else if(!this.m_RightVisible)
+        else if(!this.m_RightVisible && xStart > window.innerWidth*0.8)
         {
             this.showRight();
         }
+        else if(window.innerHeight > window.innerWidth)
+        {
+            this.m_Events.push(
+            {
+                "Type": "UIMoveLeft",
+                "Data": xDist
+            });
+        }
     }
 
-    canvasRightSwipe()
+    canvasRightSwipe(evt)
     {
-        if(this.m_RightVisible)
+        var xStart = evt.swipestart.coords[0];
+        var xEnd   = evt.swipestop.coords[0];
+        var xDist  = Math.abs(xEnd-xStart);
+
+        if(this.m_RightVisible && xStart > window.innerWidth*0.8)
         {
             this.hideRight();
             return;
         }
-        else if(!this.m_LeftVisible)
+        else if(!this.m_LeftVisible && xStart < window.innerWidth*0.2)
         {
             this.showLeft();
+        }
+        else if(window.innerHeight > window.innerWidth)
+        {
+            this.m_Events.push(
+            {
+                "Type": "UIMoveRight",
+                "Data": xDist
+            });
         }
     }
 

@@ -55,7 +55,8 @@ exports.create = async(function* (req, res) {
 
 exports.show = function (req, res) {
   const user = req.profile;
-  respond(res, 'users/show', {
+  console.log(user);
+  res.render('users/show', {
     title: user.name,
     user: user
   });

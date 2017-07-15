@@ -5,14 +5,16 @@ class NetworkClient
         var NodeAddress = "80.255.0.159";
         var NodePort = "7990";
 
-        var cvs = $(".game-canvas")[0];
-        var ctx = cvs.getContext("2d");
-        var cimgd = null;
-        var cimgPos = { x:0, y:0 };
+        this.cvs = $(".game-canvas")[0];
+        this.ctx = this.cvs.getContext("2d");
+
+        this.cimgPos = { x:0, y:0 };
 
         this.m_ImageDataQueue = [];
 
         this.m_LastReceived = 0;
+
+        var self = this;
 
         var connectionOptions =
         {
@@ -25,21 +27,17 @@ class NetworkClient
 
         var socket = io(NodeAddress + ":" + NodePort, connectionOptions);
 
-        function setRealCanvasSize()
+        function ResizeCanvas()
         {
-            cvs.width = cvs.offsetWidth;
-            cvs.height = cvs.offsetHeight;
-            if (cimgd != null)
-            {
-                ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
-            }
+            self.cvs.width = self.cvs.offsetWidth;
+            self.cvs.height = self.cvs.offsetHeight;
         }
 
-        setRealCanvasSize();
+        ResizeCanvas();
 
         $(window).resize(function()
         {
-            setRealCanvasSize();
+            ResizeCanvas();
         });
 
         socket.emit("connect");
@@ -51,7 +49,7 @@ class NetworkClient
             var imgWidth = data[0].width;
             var imgHeight = data[0].height;
 
-            cimgd = ctx.createImageData(imgWidth, imgHeight);
+            var cimgd = this.ctx.createImageData(imgWidth, imgHeight);
 
             var dataIndex = 0;
             var cimgdSize = imgWidth * imgHeight * 4;
@@ -69,28 +67,42 @@ class NetworkClient
             {
                 this.m_ImageDataQueue = [];
             }
-            this.m_ImageDataQueue.push([cimgd, cimgPos, Date.now() - this.m_LastReceived, Date.now() - data[1]]);
+            this.m_ImageDataQueue.push([cimgd, this.cimgPos, imgWidth, imgHeight, Date.now() - this.m_LastReceived, Date.now() - data[1]]);
             this.m_LastReceived = Date.now();
 
             //ctx.putImageData(cimgd, cimgPos.x, cimgPos.y);
         });
 
-        setInterval(() =>
+        function draw()
         {
-            let lastImage = this.m_ImageDataQueue.pop();
+            let lastImage = self.m_ImageDataQueue.pop();
             //console.log(lastImage);
             //console.log(this.m_ImageDataQueue.length);
-            if(lastImage === undefined || lastImage.length === 0) { return; }
-            if(lastImage[3] >= 1500)
+            if(lastImage === undefined || lastImage.length === 0)
             {
-                this.m_ImageDataQueue = [];
+                window.requestAnimationFrame(draw);
+                return;
             }
-            ctx.putImageData(lastImage[0], lastImage[1].x, lastImage[1].y);
-        }, 50);
+            if(lastImage[4] >= 1500)
+            {
+                self.m_ImageDataQueue = [];
+            }
+            if(window.innerWidth >= window.innerHeight && self.cvs.width != lastImage[2])
+            {
+                self.cvs.width = lastImage[2];
+                self.cvs.height = lastImage[3];
+            }
+            self.ctx.putImageData(lastImage[0], lastImage[1].x, lastImage[1].y);
+            window.requestAnimationFrame(draw);
+        }
 
-        setInterval(function()
+        setInterval(()=>
         {
-            socket.emit("ui_data", {"x": ui.m_LastTap.clientX, "y": ui.m_LastTap.clientY});
-        }, 2500);
+        //    console.log(ui.m_Events);
+            socket.emit("ui_data", ui.m_Events);
+            ui.m_Events = [];
+        }, 25);
+
+        window.requestAnimationFrame(draw);
     }
 }
