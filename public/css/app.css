@@ -143,6 +143,30 @@ button.error:focus {
    width:50%;
 }
 
+/*
+ * Admin
+ */
+
+.admin-users {
+    height:75%;
+    width:60%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.admin-user {
+    width:100%;
+    background-color: #555555;
+    margin-bottom: 2%;
+}
+
+
+
+
+
+
+
+
 
 /*
  * Game Content

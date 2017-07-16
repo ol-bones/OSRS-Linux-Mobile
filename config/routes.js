@@ -8,6 +8,8 @@ const index = require('../app/controllers/index');
 const users = require('../app/controllers/users');
 const play = require('../app/controllers/play');
 const nodeAgent = require('../app/controllers/nodeAgent');
+const admin = require('../app/controllers/admin');
+
 
 const auth = require('./middlewares/authorization');
 
@@ -67,6 +69,8 @@ module.exports = function (app, passport, g_ServerList)
 
     app.get('/users/:userId', users.show);
     app.param('userId', users.load);
+
+    app.get('/admin', auth.requiresLogin, admin.main);
     /**
     * Error handling
     */
