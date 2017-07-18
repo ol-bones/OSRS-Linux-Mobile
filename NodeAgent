@@ -1,0 +1,143 @@
+//-----------------Imports-----------------------//
+//      Reference           Library             //
+//---------------------------------------------//
+const http             = require("http");
+const expressServer    = require("express");
+const morgan           = require("morgan");
+
+const {exec}           = require("child_process");
+const {spawn}          = require("child_process");
+const execSync         = require("child_process").execSync;
+
+const config           = require("./config.json");
+
+//-----------------------------------------------//
+//----------------------------------------------//
+//---------------------------------------------//
+
+let express = expressServer();
+express.server = http.createServer(express);
+express.use(morgan("dev"));
+
+let streamerProcesses = [];
+
+let Address = "80.255.0.159";
+let BasePort = 9001;
+
+let Capacity = 1;
+
+var STATUS =
+{
+    "INITIALISING": "INITIALISING",
+    "AWAITING_CONNECTION": "AWAITING_CONNECTION",
+    "CONNECTED": "CONNECTED",
+    "DESTRUCTING": "DESTRUCTING",
+    "DESTROYED": "DESTROYED",
+    "ERROR": "ERROR"
+}
+
+class StreamerProcess
+{
+    constructor(port, clientIPAddress, username, password, procIndex)
+    {
+        this.m_Port = port;
+        this.m_ClientIPAddress = clientIPAddress;
+        this.m_Username = username;
+        this.m_Password = password;
+        this.m_procIndex = procIndex;
+
+        this.m_Status = STATUS.INITIALISING;
+
+        exec("DISPLAY=:0", (err, stdout, stderr) =>
+        {
+            if(!err || stderr) return;
+            console.error("- - [ERROR] - - There was a problem setting DISPLAY=:0 (%s).", err || stdout || stderr);
+        });
+
+        const streamer = execSync("python3 ../StreamerProcess/main.py --"+clientIPAddress+" --"+username+" --"+password);
+        console.log("- - [INFO] - - %s spawned a streamer process...", clientIPAddress);
+
+        this.m_Status = STATUS.AWAITING_CONNECTION;
+
+        streamer.stdout.on("data", (data) =>
+        {
+            this.m_Status = STATUS.CONNECTED;
+            console.log("StreamerProcess: %s", data);
+        });
+        streamer.stderr.on("data", (data) =>
+        {
+            this.m_Status = STATUS.ERROR;
+            console.error("StreamerProcess Error: %s", data);
+        });
+        streamer.on("close", (code) =>
+        {
+            this.m_Status = STATUS.DESTRUCTING;
+            console.log("StreamerProcess Exited (%s)", code);
+        });
+    }
+
+    getInfo()
+    {
+        return JSON.stringify(
+        {
+            "info":
+            {
+                "Port": this.m_Port,
+                "Client":
+                {
+                    "IPAddress": this.m_ClientIPAddress,
+                    "Username": this.m_Username
+                },
+                "Status": this.m_Status
+            }
+        });
+    }
+}
+
+express.post("/spawnStreamer", (req, res) =>
+{
+    let dataBuffer = "";
+    req.on("data", (data) =>
+    {
+        dataBuffer += data.toString();
+    });
+    req.on("end", () =>
+    {
+        console.log(dataBuffer);
+        res.json({"Address": "80.255.0.159", "Port": "9001"});
+    });
+});
+
+express.get("/nodeInfo", (req, res) =>
+{
+    let jsonData = [];
+    for(let proc of streamerProcesses)
+    {
+        jsonData.push(proc.getInfo);
+    }
+    res.json(jsonData);
+});
+
+
+
+
+
+
+express.server.listen(9000, "80.255.0.159", () =>
+{
+    if(express.server.address().address !== config.Address)
+    {
+        console.error("- - [ERROR] - - Address different to config Address [config: %s, current: %s]", config.Address, express.server.address().address);
+    }
+    if(express.server.address().port !== config.Port)
+    {
+        console.error("- - [ERROR] - - Port different to config Port [config: %s, current: %s]", config.Port, express.server.address().port);
+    }
+
+    console.log("- - [INFO] - - Server listening on %s:%s", express.server.address().address, express.server.address().port);
+});
+
+
+
+
+
