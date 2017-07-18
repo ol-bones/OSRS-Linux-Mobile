@@ -61,4 +61,12 @@ save = (id) =>
     $(".btn-primary[name="+id+"]").hide();
     $(".btn-success[name="+id+"]").show();
     console.log(user_data);
+
+
+    $.post("admin/updateuser",
+    {
+        "_csrf": $(".admin-users").attr("_csrf"),
+        "user_data": user_data
+    });
+
 };

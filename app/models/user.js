@@ -33,6 +33,7 @@ const validatePresenceOf = value => value && value.length;
 UserSchema
   .virtual('password')
   .set(function (password) {
+      console.log("pass encrypt start");
     this._password = password;
     this.salt = this.makeSalt();
     this.hashed_password = this.encryptPassword(password);
@@ -70,11 +71,13 @@ UserSchema.path('email').validate(function (email, fn) {
 }, 'Email already exists');
 
 UserSchema.path('username').validate(function (username) {
-  if (this.skipValidation()) return true;
+  if (this.skipValidation()) console.log("skip"); return true;
+  console.log("user(%s)",username);
   return username.length;
 }, 'Username cannot be blank');
 
 UserSchema.path('hashed_password').validate(function (hashed_password) {
+    console.log("sha(%s)", hashed_password);
   if (this.skipValidation()) return true;
   return hashed_password.length && this._password.length;
 }, 'Password cannot be blank');
@@ -84,14 +87,20 @@ UserSchema.path('hashed_password').validate(function (hashed_password) {
  * Pre-save hook
  */
 
-UserSchema.pre('save', function (next) {
-  if (!this.isNew) return next();
+UserSchema.pre('save', function (next)
+{
+    console.log("pre('save'");
+    console.log(this);
+    if (!this.isNew) return next();
 
-  if (!validatePresenceOf(this.password) && !this.skipValidation()) {
-    next(new Error('Invalid password'));
-  } else {
-    next();
-  }
+    if (!validatePresenceOf(this.password) && !this.skipValidation())
+    {
+        next(new Error('Invalid password'));
+    }
+    else
+    {
+        next();
+    }
 });
 
 /**
@@ -143,6 +152,11 @@ UserSchema.methods = {
       return '';
     }
   },
+
+    skipValidation: function() {
+        return false;
+    }
+
 };
 
 /**
@@ -160,8 +174,11 @@ UserSchema.statics = {
    */
 
   load: function (options, cb) {
-    console.log(options);
+    console.log("op");
+    console.log(options.select);
+    console.log(options.criteria);
     options.select = options.select || 'name username';
+    options.select += ' Access';
     return this.findOne(options.criteria)
       .select(options.select)
       .exec(cb);

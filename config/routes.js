@@ -9,7 +9,7 @@ const users = require('../app/controllers/users');
 const play = require('../app/controllers/play');
 const nodeAgent = require('../app/controllers/nodeAgent');
 const admin = require('../app/controllers/admin');
-
+const no_beta = require('../app/controllers/no_beta');
 
 const auth = require('./middlewares/authorization');
 
@@ -51,6 +51,8 @@ module.exports = function (app, passport, g_ServerList)
 
     // play routes
     app.get('/', index.index);
+    app.get('/no_beta_access', auth.requiresLogin, no_beta.no);
+    console.log("route no beta");
     app.get('/play', auth.requiresLogin, play.play);
     app.get('/requestNode', auth.requiresLogin, play.requestNode);
 
@@ -71,6 +73,11 @@ module.exports = function (app, passport, g_ServerList)
     app.param('userId', users.load);
 
     app.get('/admin', auth.requiresLogin, admin.main);
+    app.post('/admin/updateuser', auth.requiresLogin, admin.updateuser);
+
+
+
+
     /**
     * Error handling
     */

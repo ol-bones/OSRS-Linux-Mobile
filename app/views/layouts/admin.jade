@@ -5,7 +5,7 @@ block content
     div.desktop-content
         h1 Administration
         - var list = users ? users : "empty"
-        div.admin-users
+        div.admin-users( _csrf="#{csrf_token}")
             ul
                 each user, index in list
                     div.admin-user(name=user._id)
