@@ -1,0 +1,114 @@
+const robot = require("robotjs");
+
+const express = require("express");
+const http = require("http").createServer(express);
+const io = require("socket.io")(http);
+
+var OSRS_Pos  = [105, 64];
+var OSRS_Size = [815, 640];
+
+var OSRS_Game_Size = [520, 340];
+var OSRS_Game_Pos  = [130, 86];
+
+var PDimensionsX = 360;
+var PDimensionsY = 540;
+
+var LDimensionsX = 540;
+var LDimensionsY = 360;
+
+var CaptureX = 130;
+var CaptureY = 85;
+
+var PMIN_CaptureX_Offset = 128;
+var PMAX_CaptureX_Offset = 280;
+
+var PortraitMode = true;
+
+var img = robot.screen.capture(130,80,360,540);
+
+let cl_Connected = false;
+
+io.on("connection", (socket) =>
+{
+    console.log("connect");
+    io.emit("data", img);
+
+    socket.on("ui_data", (data) =>
+    {
+        if(!data || data === undefined || data.length === 0)
+        {
+            return;
+        }
+
+        data.forEach((v,i,a)=>
+        {
+            switch(v.Type)
+            {
+                case "UITap":
+                    console.log("Tap{%s,%s}", v.Data[0], v.Data[1]);
+                    robot.moveMouse(130+(v.Data[0]*0.8), 86+v.Data[1]);
+                    robot.mouseClick();
+                    break;
+                case "UIMoveLeft":
+                    if(!PortraitMode) { break; }
+                    CaptureX = (CaptureX - v.Data >= PMIN_CaptureX_Offset) ? CaptureX-v.Data : PMIN_CaptureX_Offset;
+                    console.log(CaptureX);
+                    break;
+                case "UIMoveRight":
+                    if(!PortraitMode) { break; }
+                    CaptureX = (CaptureX+v.Data <= PMAX_CaptureX_Offset) ? CaptureX+v.Data : PMAX_CaptureX_Offset;
+                    console.log(CaptureX);
+                    break;
+                case "UIDimensions":
+                    PortraitMode = !PortraitMode;
+                    console.log("Switching orienation");
+                    break;
+                default:
+                    console.log("Unhandled Client Net Event");
+                    break;
+            }
+        });
+    });
+});
+
+
+http.listen("7990", "80.255.0.159", () =>
+{
+    console.log("listenin");
+    setInterval(() =>
+    {
+        if(PortraitMode)
+        {
+            img = [robot.screen.capture(CaptureX,CaptureY,360,OSRS_Game_Size[1]), Date.now()];
+        }
+        else
+        {
+            img =
+            [
+                robot.screen.capture(
+                    OSRS_Game_Pos[0],
+                    OSRS_Game_Pos[1],
+                    OSRS_Game_Size[0],
+                    OSRS_Game_Size[1]
+                ),
+                Date.now()
+            ];
+        }
+        delete this;
+    }, 100);
+
+    io.on("event", (data) =>
+    {
+        console.log("HEHEH");
+        console.log(data);
+    });
+
+    setInterval(() =>
+    {
+        io.emit("data", img);
+        delete this;
+    }, 100);
+});
+
+
+
