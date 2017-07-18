@@ -8,13 +8,6 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 const Schema = mongoose.Schema;
-const oAuthTypes = [
-  'github',
-  'twitter',
-  'facebook',
-  'google',
-  'linkedin'
-];
 
 /**
  * User Schema
@@ -24,15 +17,11 @@ const UserSchema = new Schema({
   name: { type: String, default: '' },
   email: { type: String, default: '' },
   username: { type: String, default: '' },
+  Access: { type: Number, default: 0},
   provider: { type: String, default: '' },
   hashed_password: { type: String, default: '' },
   salt: { type: String, default: '' },
-  authToken: { type: String, default: '' },
-  facebook: {},
-  twitter: {},
-  github: {},
-  google: {},
-  linkedin: {}
+  authToken: { type: String, default: '' }
 });
 
 const validatePresenceOf = value => value && value.length;
@@ -44,6 +33,7 @@ const validatePresenceOf = value => value && value.length;
 UserSchema
   .virtual('password')
   .set(function (password) {
+      console.log("pass encrypt start");
     this._password = password;
     this.salt = this.makeSalt();
     this.hashed_password = this.encryptPassword(password);
@@ -81,11 +71,13 @@ UserSchema.path('email').validate(function (email, fn) {
 }, 'Email already exists');
 
 UserSchema.path('username').validate(function (username) {
-  if (this.skipValidation()) return true;
+  if (this.skipValidation()) console.log("skip"); return true;
+  console.log("user(%s)",username);
   return username.length;
 }, 'Username cannot be blank');
 
 UserSchema.path('hashed_password').validate(function (hashed_password) {
+    console.log("sha(%s)", hashed_password);
   if (this.skipValidation()) return true;
   return hashed_password.length && this._password.length;
 }, 'Password cannot be blank');
@@ -95,14 +87,20 @@ UserSchema.path('hashed_password').validate(function (hashed_password) {
  * Pre-save hook
  */
 
-UserSchema.pre('save', function (next) {
-  if (!this.isNew) return next();
+UserSchema.pre('save', function (next)
+{
+    console.log("pre('save'");
+    console.log(this);
+    if (!this.isNew) return next();
 
-  if (!validatePresenceOf(this.password) && !this.skipValidation()) {
-    next(new Error('Invalid password'));
-  } else {
-    next();
-  }
+    if (!validatePresenceOf(this.password) && !this.skipValidation())
+    {
+        next(new Error('Invalid password'));
+    }
+    else
+    {
+        next();
+    }
 });
 
 /**
@@ -120,6 +118,7 @@ UserSchema.methods = {
    */
 
   authenticate: function (plainText) {
+    console.log(plainText);
     return this.encryptPassword(plainText) === this.hashed_password;
   },
 
@@ -154,13 +153,10 @@ UserSchema.methods = {
     }
   },
 
-  /**
-   * Validation is not required if using OAuth
-   */
+    skipValidation: function() {
+        return false;
+    }
 
-  skipValidation: function () {
-    return ~oAuthTypes.indexOf(this.provider);
-  }
 };
 
 /**
@@ -178,7 +174,11 @@ UserSchema.statics = {
    */
 
   load: function (options, cb) {
+    console.log("op");
+    console.log(options.select);
+    console.log(options.criteria);
     options.select = options.select || 'name username';
+    options.select += ' Access';
     return this.findOne(options.criteria)
       .select(options.select)
       .exec(cb);

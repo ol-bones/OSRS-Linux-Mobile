@@ -8,15 +8,14 @@ const index = require('../app/controllers/index');
 const users = require('../app/controllers/users');
 const play = require('../app/controllers/play');
 const nodeAgent = require('../app/controllers/nodeAgent');
+const admin = require('../app/controllers/admin');
+const no_beta = require('../app/controllers/no_beta');
 
 const auth = require('./middlewares/authorization');
 
 /**
  * Route middlewares
  */
-
-const articleAuth = [auth.requiresLogin, auth.article.hasAuthorization];
-const commentAuth = [auth.requiresLogin, auth.comment.hasAuthorization];
 
 const fail =
 {
@@ -50,6 +49,13 @@ module.exports = function (app, passport, g_ServerList)
         next();
     });
 
+    // play routes
+    app.get('/', index.index);
+    app.get('/no_beta_access', auth.requiresLogin, no_beta.no);
+    console.log("route no beta");
+    app.get('/play', auth.requiresLogin, play.play);
+    app.get('/requestNode', auth.requiresLogin, play.requestNode);
+
     // user routes
     app.get('/login', users.login);
     app.get('/signup', users.signup);
@@ -62,13 +68,15 @@ module.exports = function (app, passport, g_ServerList)
         failureRedirect: '/login',
         failureFlash: 'Invalid email or password.'
     }), users.session);
+
     app.get('/users/:userId', users.show);
     app.param('userId', users.load);
 
-    // play routes
-    app.get('/', index.index);
-    app.get('/play', auth.requiresLogin, play.play);
-    app.get('/requestNode/', auth.requiresLogin, play.connect);
+    app.get('/admin', auth.requiresLogin, admin.main);
+    app.post('/admin/updateuser', auth.requiresLogin, admin.updateuser);
+
+
+
 
     /**
     * Error handling

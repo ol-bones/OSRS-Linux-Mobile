@@ -31,6 +31,7 @@ exports.load = async(function* (req, res, next, _id) {
 exports.create = async(function* (req, res) {
   const user = new User(req.body);
   user.provider = 'local';
+  user.Access = 1;
   try {
     yield user.save();
     req.logIn(user, err => {
@@ -55,7 +56,8 @@ exports.create = async(function* (req, res) {
 
 exports.show = function (req, res) {
   const user = req.profile;
-  respond(res, 'users/show', {
+  console.log(user);
+  res.render('users/show', {
     title: user.name,
     user: user
   });
